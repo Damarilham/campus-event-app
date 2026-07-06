@@ -3,15 +3,9 @@ import { useParams, useNavigate } from "react-router";
 import { ArrowLeft, CheckCircle2, User, Hash, BookOpen, Mail, Phone, ChevronDown, Sparkles, Send } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
+import { saveEventRegistration, isEventRegistered } from "../utils/registrationCache";
+import { mockEvents } from "../utils/eventsData";
 import confetti from "canvas-confetti";
-
-const mockEvents = [
-  { id: 1, title: "AI & Machine Learning Workshop", date: "April 15, 2026", organizer: "Himpunan Mahasiswa Teknik Informatika" },
-  { id: 2, title: "Spring Career Fair 2026", date: "April 18, 2026", organizer: "Pusat Karir Universitas" },
-  { id: 3, title: "Student Leadership Summit", date: "April 22, 2026", organizer: "Badan Eksekutif Mahasiswa" },
-  { id: 4, title: "Guest Lecture: Sustainability", date: "April 25, 2026", organizer: "Fakultas Teknik Lingkungan" },
-  { id: 5, title: "Hackathon 2026", date: "April 28, 2026", organizer: "UKM Coding Club" },
-];
 
 const faculties = [
   "Teknik Informatika", "Sistem Informasi", "Teknik Elektro", "Teknik Mesin", "Teknik Sipil",
@@ -37,7 +31,18 @@ const emptyForm: FormData = {
 export function EventRegistrationPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [form, setForm] = useState<FormData>(emptyForm);
+  const [form, setForm] = useState<FormData>(() => {
+    const savedIdentity = localStorage.getItem("campus_user_identity");
+    if (savedIdentity) {
+      try {
+        const parsed = JSON.parse(savedIdentity);
+        return { ...emptyForm, ...parsed, expectation: "" };
+      } catch {
+        return emptyForm;
+      }
+    }
+    return emptyForm;
+  });
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -47,7 +52,18 @@ export function EventRegistrationPage() {
   const event = mockEvents.find((e) => e.id === Number(id));
 
   useEffect(() => {
+    if (event && isEventRegistered(event.id)) {
+      toast.error("Kamu sudah terdaftar di event ini");
+      navigate(`/events/${event.id}`);
+    }
+  }, [event, navigate]);
+
+  useEffect(() => {
     if (success) {
+      // Save identity for next time (excluding expectation)
+      const { expectation, ...identity } = form;
+      localStorage.setItem("campus_user_identity", JSON.stringify(identity));
+
       confetti({
         particleCount: 150,
         spread: 70,
@@ -55,7 +71,7 @@ export function EventRegistrationPage() {
         colors: ['#ef4444', '#f87171', '#ffffff']
       });
     }
-  }, [success]);
+  }, [success, form]);
 
   if (!event) {
     return (
@@ -92,6 +108,7 @@ export function EventRegistrationPage() {
     setSubmitting(true);
     await new Promise((r) => setTimeout(r, 1800));
     setSubmitting(false);
+    saveEventRegistration(Number(id));
     setSuccess(true);
   };
 

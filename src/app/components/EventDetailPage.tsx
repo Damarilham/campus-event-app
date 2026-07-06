@@ -3,79 +3,8 @@ import { ArrowLeft, Calendar, MapPin, Users, Clock, CheckCircle2, ChevronRight, 
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { motion } from "motion/react";
 import { useState } from "react";
-
-const mockEvents = [
-  {
-    id: 1,
-    title: "AI & Machine Learning Workshop",
-    date: "April 15, 2026",
-    time: "09:00 - 17:00 WIB",
-    location: "Engineering Building, Room 301",
-    category: "Hot",
-    image: "https://images.unsplash.com/photo-1762968269894-1d7e1ce8894e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZWNoJTIwY29uZmVyZW5jZSUyMHNlbWluYXJ8ZW58MXx8fHwxNzc1ODAxMDUxfDA&ixlib=rb-4.1.0&q=80&w=1080",
-    organizer: "Himpunan Mahasiswa Teknik Informatika",
-    quota: 100,
-    registered: 67,
-    description: "Workshop intensif tentang kecerdasan buatan dan machine learning. Peserta akan belajar dasar-dasar ML, implementasi algoritma populer, dan studi kasus nyata menggunakan Python dan TensorFlow.",
-    benefits: ["Sertifikat kehadiran", "Materi workshop eksklusif", "Akses rekaman sesi", "Networking dengan praktisi industri"],
-  },
-  {
-    id: 2,
-    title: "Spring Career Fair 2026",
-    date: "April 18, 2026",
-    time: "08:00 - 16:00 WIB",
-    location: "Student Center Main Hall",
-    category: "Hot",
-    image: "https://images.unsplash.com/photo-1763739532819-401f6a041b54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuZXR3b3JraW5nJTIwYnVzaW5lc3MlMjBtZWV0aW5nfGVufDF8fHx8MTc3NTgwMTA1NHww&ixlib=rb-4.1.0&q=80&w=1080",
-    organizer: "Pusat Karir Universitas",
-    quota: 500,
-    registered: 312,
-    description: "Career Fair terbesar di kampus yang menghadirkan lebih dari 50 perusahaan nasional dan multinasional. Kesempatan emas untuk mencari magang, kerja paruh waktu, dan pekerjaan tetap.",
-    benefits: ["Akses ke 50+ perusahaan", "Sesi CV review gratis", "Mock interview", "Seminar karir eksklusif"],
-  },
-  {
-    id: 3,
-    title: "Student Leadership Summit",
-    date: "April 22, 2026",
-    time: "08:30 - 17:30 WIB",
-    location: "Conference Center",
-    category: "Recent",
-    image: "https://images.unsplash.com/photo-1693608231470-25e1b16a23b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2xsZWdlJTIwY2FtcHVzJTIwc3R1ZGVudHN8ZW58MXx8fHwxNzc1NzExMTE0fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    organizer: "Badan Eksekutif Mahasiswa",
-    quota: 200,
-    registered: 89,
-    description: "Summit kepemimpinan mahasiswa yang mempertemukan para pemimpin organisasi kampus untuk berbagi pengalaman, belajar dari tokoh inspiratif, dan membangun jaringan antar organisasi.",
-    benefits: ["Sertifikat kepemimpinan", "Mentoring dari alumni berprestasi", "Team building activities", "Makan siang bersama"],
-  },
-  {
-    id: 4,
-    title: "Guest Lecture: Sustainability",
-    date: "April 25, 2026",
-    time: "13:00 - 15:00 WIB",
-    location: "Auditorium A",
-    category: "Recent",
-    image: "https://images.unsplash.com/photo-1759823656568-a13c88f8cf3f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1bml2ZXJzaXR5JTIwZXZlbnQlMjBoYWxsfGVufDF8fHx8MTc3NTgwMTA1MXww&ixlib=rb-4.1.0&q=80&w=1080",
-    organizer: "Fakultas Teknik Lingkungan",
-    quota: 300,
-    registered: 201,
-    description: "Kuliah tamu dari pakar lingkungan internasional membahas tantangan dan solusi keberlanjutan di era modern. Diskusi mendalam tentang energi terbarukan, pengelolaan limbah, dan kebijakan lingkungan.",
-    benefits: ["Sertifikat kehadiran", "Buku sustainability gratis", "Sesi tanya jawab langsung", "Akses jurnal eksklusif"],
-  },
-  {
-    id: 5,
-    title: "Hackathon 2026",
-    date: "April 28, 2026",
-    time: "07:00 - 07:00 WIB (+1 hari)",
-    location: "Computer Science Building",
-    category: "Hot",
-    image: "https://images.unsplash.com/photo-1762968269894-1d7e1ce8894e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZWNoJTIwY29uZmVyZW5jZSUyMHNlbWluYXJ8ZW58MXx8fHwxNzc1ODAxMDUxfDA&ixlib=rb-4.1.0&q=80&w=1080",
-    organizer: "UKM Coding Club",
-    quota: 150,
-    registered: 143,
-    description: "Hackathon 24 jam bertemakan Smart Campus. Peserta akan membentuk tim 3-5 orang untuk membangun solusi inovatif berbasis teknologi bagi permasalahan kampus. Total hadiah senilai Rp 30 juta.",
-    benefits: ["Total hadiah Rp 30 juta", "Mentoring dari engineer profesional", "Meal & snack selama event", "Sertifikat & merchandise eksklusif"],
-  },
-];
+import { isEventRegistered } from "../utils/registrationCache";
+import { mockEvents } from "../utils/eventsData";
 
 export function EventDetailPage() {
   const { id } = useParams();
@@ -102,6 +31,7 @@ export function EventDetailPage() {
 
   const spotsLeft = event.quota - event.registered;
   const fillPercent = Math.round((event.registered / event.quota) * 100);
+  const alreadyRegistered = isEventRegistered(event.id);
 
   return (
     <motion.div 
@@ -113,6 +43,35 @@ export function EventDetailPage() {
       {/* iOS Status Bar */}
       <div className="h-12 bg-white sticky top-0 z-50" />
 
+      {/* Floating Header (Sticky) */}
+      <div className="fixed top-12 left-0 right-0 z-50 px-6 py-4 pointer-events-none">
+        <div className="flex justify-between items-center max-w-lg mx-auto">
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={() => navigate("/events")}
+            className="w-12 h-12 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-2xl border border-white/20 pointer-events-auto shadow-sm active:bg-white/40"
+          >
+            <ArrowLeft className="w-6 h-6 text-white" />
+          </motion.button>
+          
+          <div className="flex gap-3 pointer-events-auto">
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              className="w-12 h-12 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-sm active:bg-white/40"
+            >
+              <Share2 className="w-5 h-5 text-white" />
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsLiked(!isLiked)}
+              className="w-12 h-12 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-sm active:bg-white/40"
+            >
+              <Heart className={`w-5 h-5 ${isLiked ? "text-red-500 fill-red-500" : "text-white"}`} />
+            </motion.button>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Image */}
       <div className="relative h-80">
         <ImageWithFallback
@@ -121,33 +80,6 @@ export function EventDetailPage() {
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-        {/* Floating buttons */}
-        <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => navigate("/events")}
-            className="w-12 h-12 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-2xl border border-white/20"
-          >
-            <ArrowLeft className="w-6 h-6 text-white" />
-          </motion.button>
-          
-          <div className="flex gap-3">
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              className="w-12 h-12 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-2xl border border-white/20"
-            >
-              <Share2 className="w-5 h-5 text-white" />
-            </motion.button>
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsLiked(!isLiked)}
-              className="w-12 h-12 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-2xl border border-white/20"
-            >
-              <Heart className={`w-5 h-5 ${isLiked ? "text-red-500 fill-red-500" : "text-white"}`} />
-            </motion.button>
-          </div>
-        </div>
 
         {/* Hero Title Overlay */}
         <div className="absolute bottom-6 left-6 right-6">
@@ -259,13 +191,28 @@ export function EventDetailPage() {
             <p className="text-lg font-black text-gray-900">FREE</p>
           </div>
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => navigate(`/events/${id}/register`)}
-            disabled={spotsLeft === 0}
-            className="flex-[2] py-4.5 bg-red-500 text-white rounded-[24px] font-extrabold text-lg shadow-xl shadow-red-200 active:bg-red-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none transition-all"
+            whileHover={alreadyRegistered ? {} : { scale: 1.02 }}
+            whileTap={alreadyRegistered ? {} : { scale: 0.98 }}
+            onClick={() => !alreadyRegistered && spotsLeft > 0 && navigate(`/events/${id}/register`)}
+            disabled={spotsLeft === 0 || alreadyRegistered}
+            className={`flex-[2] py-4.5 rounded-[24px] font-extrabold text-lg transition-all ${
+              alreadyRegistered
+                ? "bg-green-50 text-green-600 border-2 border-green-200"
+                : spotsLeft === 0
+                ? "bg-gray-200 text-gray-400"
+                : "bg-red-500 text-white shadow-xl shadow-red-200 active:bg-red-600"
+            }`}
           >
-            {spotsLeft === 0 ? "Kuota Penuh" : "Daftar Sekarang"}
+            {alreadyRegistered ? (
+              <span className="flex items-center justify-center gap-2">
+                <CheckCircle2 className="w-5 h-5" />
+                Sudah Terdaftar
+              </span>
+            ) : spotsLeft === 0 ? (
+              "Kuota Penuh"
+            ) : (
+              "Daftar Sekarang"
+            )}
           </motion.button>
         </div>
       </div>

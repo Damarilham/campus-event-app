@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { User, Lock, Eye, EyeOff, CalendarDays, ArrowRight } from "lucide-react";
+import { clearRegistrationCache } from "../utils/registrationCache";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ export function LoginPage() {
     await new Promise((r) => setTimeout(r, 1000));
     setLoading(false);
 
+    clearRegistrationCache(); // Reset state for new user
     localStorage.setItem("campus_username", username.trim());
     navigate("/events");
   };
